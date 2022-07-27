@@ -1,39 +1,41 @@
-import memesData from "../memesData.jsx"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Meme() {
 
     const [meme, setMeme] = useState({
         topText: "",
         bottomText: "",
-        randomImage: "http://i.imgflip.com/1bij.jpg" 
+        randomImage: "http://i.imgflip.com/1bij.jpg"
     })
-    const [allMemeImages, setAllMemeImages] = useState(memesData)
-    
-    
+    const [allMemes, setAllMemes] = useState([])
+
+    useEffect(() => {
+        fetch("https://api.imgflip.com/get_memes")
+            .then(res => res.json())
+            .then(data => setAllMemes(data.data.memes))
+    }, [])
+
     function getMemeImage() {
-        const memesArray = allMemeImages.data.memes
-        const randomNumber = Math.floor(Math.random() * memesArray.length)
-        const url = memesArray[randomNumber].url
+        const randomNumber = Math.floor(Math.random() * allMemes.length)
+        const url = allMemes[randomNumber].url
         setMeme(prevMeme => ({
             ...prevMeme,
             randomImage: url
         }))
-        
     }
-    
+
     function handleChange(event) {
-        const {name, value} = event.target
+        const { name, value } = event.target
         setMeme(prevMeme => ({
             ...prevMeme,
             [name]: value
         }))
     }
-    
+
     return (
         <main>
             <div className="form">
-                <input 
+                <input
                     type="text"
                     placeholder="Top text"
                     className="form--input"
@@ -41,7 +43,7 @@ export default function Meme() {
                     value={meme.topText}
                     onChange={handleChange}
                 />
-                <input 
+                <input
                     type="text"
                     placeholder="Bottom text"
                     className="form--input"
@@ -49,7 +51,7 @@ export default function Meme() {
                     value={meme.bottomText}
                     onChange={handleChange}
                 />
-                <button 
+                <button
                     className="form--button"
                     onClick={getMemeImage}
                 >
